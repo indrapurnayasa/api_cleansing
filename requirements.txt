@@ -1,0 +1,6 @@
+Flask
+swagger
+Unidecode
+pandas
+sqlite3
+regex
