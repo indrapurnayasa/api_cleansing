@@ -37,8 +37,8 @@ swagger = Swagger(app, template=swagger_template,
 
 conn = sqlite3.connect("db_challenge.db", check_same_thread=False)
 mycur = conn.cursor()
-mycur.execute("DROP TABLE IF EXISTS cleanData")
-mycur.execute("DROP TABLE IF EXISTS rawData")
+# mycur.execute("DROP TABLE IF EXISTS cleanData")
+# mycur.execute("DROP TABLE IF EXISTS raw_Data")
 mycur.execute("CREATE TABLE IF NOT EXISTS cleaning_text(raw_text varchar(50), clean_text varchar(50))")
 
 def remove_punct(text):
@@ -53,17 +53,13 @@ def replace_ascii2(text):
 def remove_newline(text):
     return re.sub('\n', '', text)
 
-@app.route("/", methods=['GET'])
-def main():
-    return 'Homepage'
-
 @swag_from("swagger_config.yml", methods=['POST'])
 @app.route("/remove_punct/v1", methods=['POST'])
 def remove_punct_posts():
     text = request.get_json()
-    non_punct = remove_newline(text['text'])
-    non_punct = replace_ascii(non_punct)
+    non_punct = replace_ascii(text['text'])
     non_punct = replace_ascii2(non_punct)
+    non_punct = remove_newline(non_punct)
     non_punct = remove_punct(non_punct)
 
     data = [(text['text']), non_punct]
@@ -72,7 +68,7 @@ def remove_punct_posts():
     return jsonify({"clean_result":non_punct})
 
 @swag_from("swagger_config_file.yml", methods=['POST'])
-@app.route("/remove_punct_file", methods=['POST'])
+@app.route("/remove_punct_file/V1", methods=['POST'])
 def upload_file():
     file_input = request.files['file']
     df = pd.read_csv(file_input, encoding="ISO-8859-1", sep=",")
